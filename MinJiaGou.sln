@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinSqlServer", "MinSqlServe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinFileRW", "MinFileRW\MinFileRW.csproj", "{A949F03D-82CF-4EA6-8770-9BA638AB28C6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelegateCommunication", "DelegateCommunication\DelegateCommunication.csproj", "{099F9EA6-AD53-46EF-9C21-520DCDDA82F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A949F03D-82CF-4EA6-8770-9BA638AB28C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A949F03D-82CF-4EA6-8770-9BA638AB28C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A949F03D-82CF-4EA6-8770-9BA638AB28C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{099F9EA6-AD53-46EF-9C21-520DCDDA82F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{099F9EA6-AD53-46EF-9C21-520DCDDA82F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{099F9EA6-AD53-46EF-9C21-520DCDDA82F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{099F9EA6-AD53-46EF-9C21-520DCDDA82F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,4 +12,9 @@
     <None Remove="UI\MainFm.resx~RF3f961e5d.TMP" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BLL\" />
+    <Folder Include="DAL\" />
+  </ItemGroup>
+
 </Project>

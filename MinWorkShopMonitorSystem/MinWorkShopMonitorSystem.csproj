@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="UI\co0dfcqh.vbv~" />
+    <Folder Include="DAL\" />
+    <Folder Include="Model\" />
   </ItemGroup>
 
   <ItemGroup>

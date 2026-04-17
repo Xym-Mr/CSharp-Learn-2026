@@ -19,7 +19,6 @@ namespace MinFileRW.Utility
 
         public JsonConfigManager(string filePath)
         {
-            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath), "配置文件路径不能为空");
             _configFilePath = filePath;//字段私有不对外暴露，只读、构造函数初始化字段，外部无法通过其他途径变更字段值，保证字段值和类实例对象深度一对一绑定，。
 
             EnsureDirectoryExists();

@@ -16,11 +16,11 @@ namespace MinWorkShopMonitorSystem.Utility
         /// <summary>
         /// 日志基础路径
         /// </summary>
-        private readonly string logBasePath = Path.Combine(AppContext.BaseDirectory, "logs");
+        private readonly static string logBasePath = Path.Combine(AppContext.BaseDirectory, "logs");
         /// <summary>
         /// 线程安全锁
         /// </summary>
-        private readonly object _lock = new object();
+        private readonly static object _lock = new object();
 
         /// <summary>
         /// 日志级别
@@ -77,7 +77,7 @@ namespace MinWorkShopMonitorSystem.Utility
         #endregion
 
         //私有的实现方法
-        private void WriteLog(string msg, LogLevel level, string methodName, Exception ex = null)
+        private static void WriteLog(string msg, LogLevel level, string methodName, Exception ex = null)
         {
             try
             {

@@ -89,7 +89,7 @@
             btnMonitorEnable.Location = new Point(639, 30);
             btnMonitorEnable.Name = "btnMonitorEnable";
             btnMonitorEnable.Size = new Size(121, 34);
-            btnMonitorEnable.TabIndex = 10;
+            btnMonitorEnable.TabIndex = 5;
             btnMonitorEnable.Text = "MonitoerEnable";
             btnMonitorEnable.UseVisualStyleBackColor = true;
             // 
@@ -99,7 +99,7 @@
             cbStopBits.Location = new Point(512, 39);
             cbStopBits.Name = "cbStopBits";
             cbStopBits.Size = new Size(121, 25);
-            cbStopBits.TabIndex = 9;
+            cbStopBits.TabIndex = 4;
             // 
             // label5
             // 
@@ -116,7 +116,7 @@
             cbDataBits.Location = new Point(387, 39);
             cbDataBits.Name = "cbDataBits";
             cbDataBits.Size = new Size(121, 25);
-            cbDataBits.TabIndex = 7;
+            cbDataBits.TabIndex = 3;
             // 
             // label4
             // 
@@ -133,7 +133,7 @@
             cbParity.Location = new Point(262, 39);
             cbParity.Name = "cbParity";
             cbParity.Size = new Size(121, 25);
-            cbParity.TabIndex = 5;
+            cbParity.TabIndex = 2;
             // 
             // label3
             // 
@@ -150,7 +150,7 @@
             cbBaudRate.Location = new Point(137, 39);
             cbBaudRate.Name = "cbBaudRate";
             cbBaudRate.Size = new Size(121, 25);
-            cbBaudRate.TabIndex = 3;
+            cbBaudRate.TabIndex = 1;
             // 
             // label2
             // 
@@ -167,7 +167,7 @@
             cbPortName.Location = new Point(12, 39);
             cbPortName.Name = "cbPortName";
             cbPortName.Size = new Size(121, 25);
-            cbPortName.TabIndex = 1;
+            cbPortName.TabIndex = 0;
             // 
             // label1
             // 
@@ -221,7 +221,7 @@
             gbLogInfos.Size = new Size(200, 369);
             gbLogInfos.TabIndex = 0;
             gbLogInfos.TabStop = false;
-            gbLogInfos.Text = "LogInfos";
+            gbLogInfos.Text = "RunLogInfos";
             // 
             // tbLogInfos
             // 

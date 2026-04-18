@@ -81,9 +81,9 @@ namespace MinWorkShopMonitorSystem.Utility
         {
             try
             {
-                string directory = Path.Combine(logBasePath, $"{DateTime.Now:yyyy-MM-dd}logs");
+                string directory = Path.Combine(logBasePath, $"{DateTime.Now:yyyy-MM}logs");
                 if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);//创建文件目录
-                string fileName = $"{DateTime.Now:HH:mm:ss}.log";//文件全名
+                string fileName = $"{DateTime.Now:yyyy-MM-dd}.log";//文件全名
                 //全路径：APP启动路径\logs\yyyy-MM-ddlogs\HH:mm:ss.log
                 string logFullPath = Path.Combine(directory, fileName);
 

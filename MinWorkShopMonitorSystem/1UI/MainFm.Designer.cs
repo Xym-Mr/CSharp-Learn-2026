@@ -30,6 +30,7 @@
         {
             pnlCommunication = new Panel();
             gbCommunication = new GroupBox();
+            btnSetting = new Button();
             btnMonitorEnable = new Button();
             cbStopBits = new ComboBox();
             label5 = new Label();
@@ -45,7 +46,7 @@
             gbDatas = new GroupBox();
             dgvDatas = new DataGridView();
             gbLogInfos = new GroupBox();
-            tbLogInfos = new TextBox();
+            lbLoginfos = new ListBox();
             pnlCommunication.SuspendLayout();
             gbCommunication.SuspendLayout();
             pnlMain.SuspendLayout();
@@ -60,11 +61,12 @@
             pnlCommunication.Dock = DockStyle.Top;
             pnlCommunication.Location = new Point(0, 0);
             pnlCommunication.Name = "pnlCommunication";
-            pnlCommunication.Size = new Size(772, 73);
+            pnlCommunication.Size = new Size(865, 73);
             pnlCommunication.TabIndex = 0;
             // 
             // gbCommunication
             // 
+            gbCommunication.Controls.Add(btnSetting);
             gbCommunication.Controls.Add(btnMonitorEnable);
             gbCommunication.Controls.Add(cbStopBits);
             gbCommunication.Controls.Add(label5);
@@ -79,19 +81,30 @@
             gbCommunication.Dock = DockStyle.Fill;
             gbCommunication.Location = new Point(0, 0);
             gbCommunication.Name = "gbCommunication";
-            gbCommunication.Size = new Size(772, 73);
+            gbCommunication.Size = new Size(865, 73);
             gbCommunication.TabIndex = 0;
             gbCommunication.TabStop = false;
             gbCommunication.Text = "ModbusRtu";
             // 
+            // btnSetting
+            // 
+            btnSetting.Location = new Point(639, 10);
+            btnSetting.Name = "btnSetting";
+            btnSetting.Size = new Size(118, 30);
+            btnSetting.TabIndex = 9;
+            btnSetting.Text = "Setting";
+            btnSetting.UseVisualStyleBackColor = true;
+            btnSetting.Click += btnSetting_Click;
+            // 
             // btnMonitorEnable
             // 
-            btnMonitorEnable.Location = new Point(639, 30);
+            btnMonitorEnable.Location = new Point(639, 40);
             btnMonitorEnable.Name = "btnMonitorEnable";
-            btnMonitorEnable.Size = new Size(121, 34);
+            btnMonitorEnable.Size = new Size(118, 30);
             btnMonitorEnable.TabIndex = 5;
             btnMonitorEnable.Text = "MonitoerEnable";
             btnMonitorEnable.UseVisualStyleBackColor = true;
+            btnMonitorEnable.Click += btnMonitorEnable_Click;
             // 
             // cbStopBits
             // 
@@ -185,7 +198,7 @@
             pnlMain.Dock = DockStyle.Fill;
             pnlMain.Location = new Point(0, 73);
             pnlMain.Name = "pnlMain";
-            pnlMain.Size = new Size(772, 369);
+            pnlMain.Size = new Size(865, 369);
             pnlMain.TabIndex = 1;
             // 
             // gbDatas
@@ -194,7 +207,7 @@
             gbDatas.Dock = DockStyle.Fill;
             gbDatas.Location = new Point(200, 0);
             gbDatas.Name = "gbDatas";
-            gbDatas.Size = new Size(572, 369);
+            gbDatas.Size = new Size(665, 369);
             gbDatas.TabIndex = 1;
             gbDatas.TabStop = false;
             gbDatas.Text = "Datas";
@@ -209,12 +222,12 @@
             dgvDatas.Location = new Point(3, 19);
             dgvDatas.Name = "dgvDatas";
             dgvDatas.ReadOnly = true;
-            dgvDatas.Size = new Size(566, 347);
+            dgvDatas.Size = new Size(659, 347);
             dgvDatas.TabIndex = 0;
             // 
             // gbLogInfos
             // 
-            gbLogInfos.Controls.Add(tbLogInfos);
+            gbLogInfos.Controls.Add(lbLoginfos);
             gbLogInfos.Dock = DockStyle.Left;
             gbLogInfos.Location = new Point(0, 0);
             gbLogInfos.Name = "gbLogInfos";
@@ -223,20 +236,21 @@
             gbLogInfos.TabStop = false;
             gbLogInfos.Text = "RunLogInfos";
             // 
-            // tbLogInfos
+            // lbLoginfos
             // 
-            tbLogInfos.Dock = DockStyle.Fill;
-            tbLogInfos.Location = new Point(3, 19);
-            tbLogInfos.Multiline = true;
-            tbLogInfos.Name = "tbLogInfos";
-            tbLogInfos.Size = new Size(194, 347);
-            tbLogInfos.TabIndex = 0;
+            lbLoginfos.Dock = DockStyle.Fill;
+            lbLoginfos.FormattingEnabled = true;
+            lbLoginfos.ItemHeight = 17;
+            lbLoginfos.Location = new Point(3, 19);
+            lbLoginfos.Name = "lbLoginfos";
+            lbLoginfos.Size = new Size(194, 347);
+            lbLoginfos.TabIndex = 10;
             // 
             // MainFm
             // 
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(772, 442);
+            ClientSize = new Size(865, 442);
             Controls.Add(pnlMain);
             Controls.Add(pnlCommunication);
             Name = "MainFm";
@@ -249,7 +263,6 @@
             gbDatas.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvDatas).EndInit();
             gbLogInfos.ResumeLayout(false);
-            gbLogInfos.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -270,8 +283,9 @@
         private Button btnMonitorEnable;
         private Panel pnlMain;
         private GroupBox gbLogInfos;
-        private TextBox tbLogInfos;
         private GroupBox gbDatas;
         private DataGridView dgvDatas;
+        private Button btnSetting;
+        private ListBox lbLoginfos;
     }
 }

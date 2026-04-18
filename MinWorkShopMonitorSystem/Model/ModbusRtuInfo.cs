@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace MinWorkShopMonitorSystem.Model
 {
     /// <summary>
-    /// ModbusRtu通讯配置信息实体
+    /// ModbusRtu实体类
     /// </summary>
     internal class ModbusRtuInfo
     {

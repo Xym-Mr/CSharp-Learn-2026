@@ -18,7 +18,6 @@ namespace MinWorkShopMonitorSystem.BLL
             return SerialPort.GetPortNames();
         }
 
-
         /// <summary>
         /// 获取指定路径的json配置文件内容
         /// </summary>

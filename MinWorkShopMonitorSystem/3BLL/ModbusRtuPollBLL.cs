@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualBasic.Devices;
+using MinWorkShopMonitorSystem._4DAL;
+using MinWorkShopMonitorSystem.DAL;
 using MinWorkShopMonitorSystem.Tools;
 using System;
 using System.Collections.Generic;
@@ -7,21 +9,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MinWorkShopMonitorSystem.DAL
+///BLL 层的本质是“业务规则的实现”，即使这些规则涉及技术细节，只要它们是解决业务问题的必要逻辑，就属于 BLL
+namespace MinWorkShopMonitorSystem.BLL
 {
     /// <summary>
     /// ModbusRtu主站通讯类，只关注从站数据读写操作的报文传输
+    /// 
+    /// 聚焦于“如何用 Modbus 协议表达业务需求”  
+    /// 报文构建
+    /// 1、接收UI层的业务请求-->通过Modbus读取输入寄存器的值
+    /// 2、根据ModbusRTU协议规范，将业务请求（“读取寄存器”）转换为符合协议格式的字节数组
+    /// 
+    /// 报文解析
+    /// 1、将接收到的字节数组解析为业务可理解的数据（如从响应中提取寄存器值）
+    /// 2、响应UI层的业务请求-->返回寄存器的值
     /// </summary>
-    internal class ModbusRtuPoll
+    internal class ModbusRtuPollBLL
     {
-        private readonly SerialPort _serialPort = null;
+        private readonly IMobusTransport _transport = null;
         private readonly static object _lock = new object();
 
-        public ModbusRtuPoll(SerialPort serialPort)
+        public ModbusRtuPollBLL(IMobusTransport transport)
         {
-            if (serialPort == null) throw new ArgumentNullException(nameof(serialPort), "串口对象为空，初始化失败");
-            if (!serialPort.IsOpen) throw new InvalidOperationException($"{serialPort}当前串口未被打开");
-            _serialPort = serialPort;//使用这个通讯类强制需要注入一个serialport.isopen=true的对象
+            _transport = transport;//使用这个通讯类强制需要注入一个serialport对象
         }
 
         /// <summary>
@@ -37,32 +47,18 @@ namespace MinWorkShopMonitorSystem.DAL
             send[6] = crc[0];
             send[7] = crc[1];
 
-            byte[] reciver = null;
-
-            lock (_lock)
-            {
-                this._serialPort.DiscardInBuffer();
-                this._serialPort.DiscardInBuffer();
-
-                //发送报文
-                this._serialPort.Write(send, 0, send.Length);
-                Thread.Sleep(50);
-                //接收报文
-                reciver = new byte[this._serialPort.BytesToRead];
-                this._serialPort.Read(reciver, 0, reciver.Length);
-            }
+            //发送、接收报文
+            byte[] reciver = _transport.SendReceive(send);
 
             if (reciver == null) throw new ArgumentNullException(nameof(reciver), "3区数据读取为空");
-
             try
             {
                 //解析报文
                 // Tx: 000000 - 01 04 00 00 00 0A 70 0D
                 // Rx: 000001 - 01 04 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 95 81
-
                 if (reciver.Length > 5)
                 {
-                    if ((byte)reciver[0] == slaveId && (byte)reciver[1] == 0x04)
+                    if (reciver[0] == slaveId && reciver[1] == 0x04)
                     {
                         ushort dataLen = reciver[2];//获取数据字节个数/2=读取的寄存器个数
                         if (reciver.Length == dataLen + 5)
@@ -89,7 +85,6 @@ namespace MinWorkShopMonitorSystem.DAL
             {
                 throw;
             }
-
         }
 
         /// <summary>
@@ -110,32 +105,18 @@ namespace MinWorkShopMonitorSystem.DAL
             send[6] = crc[0];
             send[7] = crc[1];
 
-            byte[] reciver = null;
-
-            lock (_lock)
-            {
-                this._serialPort.DiscardInBuffer();
-                this._serialPort.DiscardInBuffer();
-
-                //发送报文
-                this._serialPort.Write(send, 0, send.Length);
-                Thread.Sleep(50);
-                //接收报文
-                reciver = new byte[this._serialPort.BytesToRead];
-                this._serialPort.Read(reciver, 0, reciver.Length);
-            }
+            //发送、接收报文
+            byte[] reciver = _transport.SendReceive(send);
 
             if (reciver == null) throw new ArgumentNullException(nameof(reciver), "3区数据读取为空");
-
             try
             {
                 //解析报文
                 //Tx: 000004 - 01 03 00 00 00 0A C5 CD
                 //Rx: 000005 - 01 03 14 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A3 67
-
                 if (reciver.Length > 5)
                 {
-                    if ((byte)reciver[0] == slaveId && (byte)reciver[1] == 0x03)
+                    if (reciver[0] == slaveId && reciver[1] == 0x03)
                     {
                         ushort dataLen = reciver[2];//获取数据字节个数/2=读取的寄存器个数
                         if (reciver.Length == dataLen + 5)
@@ -163,6 +144,16 @@ namespace MinWorkShopMonitorSystem.DAL
                 throw;
             }
 
+        }
+
+        public bool Open()
+        {
+            return _transport.Open();
+        }
+
+        public void Close()
+        {
+            _transport.Close();
         }
 
     }

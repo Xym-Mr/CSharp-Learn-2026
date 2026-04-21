@@ -10,7 +10,7 @@ namespace MinWorkShopMonitorSystem.DAL
     internal class MainDAL
     {
         /// <summary>
-        /// Json文件读取
+        /// Json文件读取，返回T
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
@@ -20,6 +20,19 @@ namespace MinWorkShopMonitorSystem.DAL
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path), "文件路径不能为空");
             return new JsonConfigManager(path).Read<T>();
+        }
+
+        /// <summary>
+        /// Json文件读取，返回List<T>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public List<T> GetJsonConfigToList<T>(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path), "文件路径不能为空");
+            return new JsonConfigManager(path).ReadtoList<T>();
         }
 
         /// <summary>

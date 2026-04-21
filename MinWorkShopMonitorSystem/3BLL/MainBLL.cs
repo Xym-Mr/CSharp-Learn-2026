@@ -19,7 +19,7 @@ namespace MinWorkShopMonitorSystem.BLL
         }
 
         /// <summary>
-        /// 获取指定路径的json配置文件内容
+        /// 获取指定路径的json配置文件内容，返回T
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
@@ -28,6 +28,18 @@ namespace MinWorkShopMonitorSystem.BLL
         {
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path), "文件路径不能为空");
             return this.mainDAL.GetJsonConfig<T>(path);
+        }
+
+        /// <summary>
+        /// 获取指定路径的json配置文件内容，返回List<T>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public List<T> GetJsonConfigTolist<T>(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentNullException(nameof(path), "文件路径不能为空");
+            return this.mainDAL.GetJsonConfigToList<T>(path);
         }
 
         /// <summary>

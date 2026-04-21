@@ -61,6 +61,31 @@ namespace MinWorkShopMonitorSystem.Utility
         }
 
         /// <summary>
+        /// 读取Json配置文件，返回一个实体类对象集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public List<T> ReadtoList<T>()
+        {
+            _lock.EnterReadLock();
+            try
+            {
+                if (File.Exists(_configFilePath))
+                {
+                    string json = File.ReadAllText(_configFilePath);
+                    return JsonSerializer.Deserialize<List<T>>(json);
+                }
+                return default;
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            { _lock.ExitReadLock(); }
+        }
+
+        /// <summary>
         /// 将实体类对象数据写入到Json配置文件中
         /// </summary>
         /// <typeparam name="T"></typeparam>

@@ -25,6 +25,7 @@ namespace MinWorkShopMonitorSystem.UI
             this.Load += MainFm_Load;
         }
 
+        #region 字段属性
         private bool _isMonitor = false;
 
         public bool IsMonitor
@@ -48,9 +49,21 @@ namespace MinWorkShopMonitorSystem.UI
                 _isOpen = value;
             }
         }
+        #endregion
 
+        #region 委托事件
+        private delegate void DataReadChangeDlg(SlaveInfo slaveInfo, ushort[] ushorts);
+        /// <summary>
+        /// 自定义委托事件
+        /// </summary>
+        private event DataReadChangeDlg OnDataReadChanged;
 
-
+        private delegate void DGVDataChangDlg(int slaveId, int address, double ushorts);
+        /// <summary>
+        /// 自定义委托事件
+        /// </summary>
+        private event DGVDataChangDlg OnDGVDataChang;
+        #endregion
 
         #region 变量
         private System.Timers.Timer MonitorTimer = null;
@@ -68,6 +81,8 @@ namespace MinWorkShopMonitorSystem.UI
         /// 参数取值范围文件路径
         /// </summary>
         private string modbusRangeConfigPath = "";
+        private string slaveDeviceInfoPath;
+        private string slaveInfoPath;
         /// <summary>
         /// 波特率取值范围集合
         /// </summary>
@@ -76,6 +91,12 @@ namespace MinWorkShopMonitorSystem.UI
         /// 数据位取值范围集合
         /// </summary>
         private List<string> dataBitsRange;
+        /// <summary>
+        /// 配置文件中设定的设备信息集合
+        /// </summary>
+        private List<SlaveDeviceInfo> slaveDeviceInfos = null;
+        private BindingList<DgvDeviceInfo> dgvDeviceInfos;
+        private List<SlaveInfo> slaveInfos;
         #endregion
 
         private void MainFm_Load(object? sender, EventArgs e)
@@ -96,6 +117,8 @@ namespace MinWorkShopMonitorSystem.UI
                 //加载配置文件
                 LoadParamINIConfig();
                 LoadModbusRtuJsonConfig();
+                LoadSlaveDeviceInfos();
+                LoadSlaveInfos();
 
                 //控件初始数据绑定
                 IniUIControlsBindingData();
@@ -106,6 +129,71 @@ namespace MinWorkShopMonitorSystem.UI
                 this.LogMonitorInfo($"程序启动错误，请根据错误信息反馈至管理员!：{ex.Message}");
                 Log.Error("程序启动出错", ex);
                 MessageBox.Show($"初始化错误，请重启程序！\r\n{ex.Message}");
+            }
+        }
+
+        #region 私有方法
+        private void LoadSlaveInfos()
+        {
+            this.slaveInfos = this.mainBll.GetJsonConfigTolist<SlaveInfo>(this.slaveInfoPath);
+        }
+
+        /// <summary>
+        /// 从配置文件中加载从站设备的设定信息（从站ID，PLC地址，参数限值设定）
+        /// </summary>
+        private void LoadSlaveDeviceInfos()
+        {
+            this.slaveDeviceInfos = this.mainBll.GetJsonConfigTolist<SlaveDeviceInfo>(this.slaveDeviceInfoPath);
+
+            IniDGVDeviceInfos();
+        }
+
+        private void IniDGVDeviceInfos()
+        {
+            try
+            {
+                if (this.slaveDeviceInfos?.Count() > 0)
+                {
+                    dgvDeviceInfos = new BindingList<DgvDeviceInfo>();
+                    foreach (var info in this.slaveDeviceInfos)
+                    {
+                        dgvDeviceInfos.Add(new DgvDeviceInfo()
+                        {
+                            SlaveDeviceID = info.SlaveDeviceID,
+                            Address = info.Address,
+                            DataName = info.DataName,
+                            Unit = info.Unit,
+                            High = info.High,
+                            Low = info.Low,
+                            CurrentValue = 0
+                        });
+                    }
+
+                    this.OnDGVDataChang += MainFm_OnDGVDataChang;
+                    dgvDatas.CellFormatting += DgvDatas_CellFormatting; 
+                    this.slaveDeviceInfos.Clear();
+                }
+                this.dgvDatas.DataSource = this.dgvDeviceInfos;
+            }
+            catch (Exception ex)
+            {
+                dgvDatas.CellFormatting -= DgvDatas_CellFormatting;
+                this.OnDGVDataChang -= MainFm_OnDGVDataChang;
+                Log.Error("表格初始化失败", ex);
+            }
+        }
+
+        private void DgvDatas_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (dgvDatas.Columns[e.ColumnIndex].Name == "IsAlarm")
+            {
+                if (e.RowIndex < 0 || e.RowIndex >= dgvDatas.Rows.Count)
+                    return;
+                var device = dgvDatas.Rows[e.RowIndex].DataBoundItem as DgvDeviceInfo;
+                if (device == null) return;
+
+                // 只有DGV自己绘制时才变色，效率提升100倍
+                e.CellStyle.BackColor = device.IsAlarm ? Color.Red : Color.White;
             }
         }
 
@@ -127,6 +215,8 @@ namespace MinWorkShopMonitorSystem.UI
         {
             this.modbusRtuConfigPath = AppConfigManager.GetAbsolutePath("JsonFilePath");
             this.modbusRangeConfigPath = AppConfigManager.GetAbsolutePath("INIFilePath");
+            this.slaveDeviceInfoPath = AppConfigManager.GetAbsolutePath("SlaveDeviceInfoPath");
+            this.slaveInfoPath = AppConfigManager.GetAbsolutePath("SlaveInfoPath");
         }
 
         /// <summary>
@@ -275,8 +365,6 @@ namespace MinWorkShopMonitorSystem.UI
             this.dgvDatas.DataSource = null;
             this.dgvDatas.AutoGenerateColumns = true;//自动添加列
             this.dgvDatas.BackgroundColor = Color.White;
-
-
         }
 
         /// <summary>
@@ -338,7 +426,7 @@ namespace MinWorkShopMonitorSystem.UI
                 this.lbLoginfos.Items.RemoveAt(this.lbLoginfos.Items.Count - 1);
             }
         }
-
+        #endregion
 
         /// <summary>
         /// 定时读取数据
@@ -347,9 +435,66 @@ namespace MinWorkShopMonitorSystem.UI
         /// <param name="e"></param>
         private void MonitorTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            this.Invoke(() => { 
-            this.LogMonitorInfo("数据采集中....");
-            });
+            try
+            {
+                if (this.slaveInfos?.Count > 0)
+                {
+                    foreach (var info in this.slaveInfos)
+                    {
+                        ushort[] resData = this.modbusRtuPoll.ReadInputRegisters((byte)info.SlaveID, (byte)info.StartAddress, (byte)info.Quantity);
+
+                        OnDataReadChanged?.Invoke(info, resData);
+                    }
+                }
+                else
+                {
+                    this.MonitorTimer.Stop();
+                    this.IsMonitor = false;
+                    LogMonitorInfo("从站点位未正确配置，无法读取，将停止数据采集");
+                    Log.Warn("从站点位未正确配置，无法读取，将停止数据采集");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.MonitorTimer.Stop();
+                this.Invoke(() =>
+                {
+                    this.IsMonitor = false;
+                    LogMonitorInfo("定时器采集数据错误" + ex.Message);
+                });
+                Log.Error("定时器采集数据错误", ex);
+                Debug.WriteLine("定时器采集数据错误");
+            }
+        }
+
+        private void TestVoid()
+        {
+            try
+            {
+                if (this.slaveInfos?.Count > 0)
+                {
+                    foreach (var info in this.slaveInfos)
+                    {
+                        ushort[] resData = this.modbusRtuPoll.ReadInputRegisters((byte)info.SlaveID, (byte)info.StartAddress, (byte)info.Quantity);
+
+                        OnDataReadChanged?.Invoke(info, resData);
+                    }
+                }
+                else
+                {
+                    Log.Warn("从站点位未正确配置，无法读取，将停止数据采集");
+                    LogMonitorInfo("从站点位未正确配置，无法读取，将停止数据采集");
+                    this.MonitorTimer.Stop();
+                    this.IsMonitor = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("定时器采集数据错误", ex);
+                LogMonitorInfo("定时器采集数据错误" + ex.Message);
+                this.MonitorTimer.Stop();
+                this.IsMonitor = false;
+            }
         }
 
         private void btnMonitorEnable_Click(object sender, EventArgs e)
@@ -360,25 +505,131 @@ namespace MinWorkShopMonitorSystem.UI
                 {
                     this.MonitorTimer.Stop();
                     this.IsMonitor = false;
+                    this.OnDataReadChanged -= MainFm_OnDataChanged;
                     this.LogMonitorInfo($"数据监控{this.IsMonitor}");
                     return;
                 }
                 else
                 {
+                    this.OnDataReadChanged += MainFm_OnDataChanged;
                     //开始定时读取
                     this.MonitorTimer.Start();
+                    //TestVoid();
                     this.IsMonitor = true;
                     this.LogMonitorInfo($"数据监控{this.IsMonitor}");
                 }
             }
             catch (Exception ex)
             {
+                this.OnDataReadChanged -= MainFm_OnDataChanged;
                 this.LogMonitorInfo($"数据监控开启失败:{ex.Message}");
                 Log.Error("数据采集异常", ex);
                 MessageBox.Show("数据采集启动异常，请检查通讯参数", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
         }
+
+        /// <summary>
+        /// 处理从站中读取到的数据
+        /// </summary>
+        /// <param name="slaveInfo"></param>
+        /// <param name="ushorts"></param>
+        private void MainFm_OnDataChanged(SlaveInfo slaveInfo, ushort[] ushorts)
+        {
+            try
+            {
+                if (slaveInfo == null || ushorts?.Count() <= 0)
+                {
+                    Log.Warn("采集的数据为空，无法解析");
+                    LogMonitorInfo("采集的数据为空，无法解析");
+                    return;
+                }
+
+                int slaveId = slaveInfo.SlaveID;
+                int quantity = slaveInfo.Quantity;
+                int startAddress = slaveInfo.StartAddress;
+
+                if (quantity != ushorts.Length)
+                {
+                    Log.Warn("设置和采集数据不匹配，无法解析");
+                    LogMonitorInfo("设置和采集数据不匹配，无法解析");
+                    return;
+                }
+
+                for (int i = startAddress; i < quantity; i++)
+                {
+                    OnDGVDataChang?.Invoke(slaveId, (ushort)i, ushorts[i] / 10.0);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.OnDataReadChanged -= MainFm_OnDataChanged;
+                this.LogMonitorInfo($"从站数据处理异常:{ex.Message}");
+                Log.Error("从站数据处理异常", ex);
+            }
+        }
+
+        /// <summary>
+        /// 刷新DGV数据显示
+        /// </summary>
+        /// <param name="slaveId"></param>
+        /// <param name="address"></param>
+        /// <param name="ushorts"></param>
+        //private void MainFm_OnDGVDataChang(int slaveId, int address, double ushorts)
+        //{
+        //    try
+        //    {
+        //        for (int i = 0; i < this.dgvDatas.Rows.Count; i++)
+        //        {
+        //            DgvDeviceInfo dgvDeviceInfo = (DgvDeviceInfo)this.dgvDatas.Rows[i].DataBoundItem;
+        //            if (dgvDeviceInfo != null)
+        //            {
+        //                if (dgvDeviceInfo.SlaveDeviceID == slaveId && dgvDeviceInfo.Address == (address + 40001))
+        //                {
+        //                    dgvDeviceInfo.CurrentValue = ushorts;
+        //                }
+        //                this.dgvDatas.Rows[i].Cells["IsAlarm"].Style.BackColor = dgvDeviceInfo.IsAlarm ? Color.Red : Color.White;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.Error("DGV数据处理异常", ex);
+        //        this.LogMonitorInfo($"DGV数据处理异常:{ex.Message}");
+        //        this.OnDGVDataChang -= MainFm_OnDGVDataChang;
+        //    }
+        //}
+
+        private void MainFm_OnDGVDataChang(int slaveId, int address, double ushorts)
+        {
+            if (this.dgvDatas.InvokeRequired)
+            {
+                this.dgvDatas.Invoke(() =>
+                {
+                    MainFm_OnDGVDataChang(slaveId, address, ushorts);
+                });
+                return;
+            }
+
+            try
+            {
+                foreach (DgvDeviceInfo info in this.dgvDatas.DataSource as BindingList<DgvDeviceInfo>)
+                {
+                    if (info.SlaveDeviceID == slaveId && info.Address == (address + 40001))
+                    {
+                        info.CurrentValue = ushorts;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("DGV数据处理异常", ex);
+                this.LogMonitorInfo($"DGV数据处理异常:{ex.Message}");
+                this.OnDGVDataChang -= MainFm_OnDGVDataChang;
+            }
+        }
+
+
 
         private void btnSetting_Click(object sender, EventArgs e)
         {

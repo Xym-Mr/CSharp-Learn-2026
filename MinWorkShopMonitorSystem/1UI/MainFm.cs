@@ -170,31 +170,28 @@ namespace MinWorkShopMonitorSystem.UI
                     }
 
                     this.OnDGVDataChang += MainFm_OnDGVDataChang;
-                    dgvDatas.CellFormatting += DgvDatas_CellFormatting; 
+                    dgvDatas.RowPrePaint += DgvDatas_RowPrePaint;
                     this.slaveDeviceInfos.Clear();
                 }
                 this.dgvDatas.DataSource = this.dgvDeviceInfos;
             }
             catch (Exception ex)
             {
-                dgvDatas.CellFormatting -= DgvDatas_CellFormatting;
+                dgvDatas.RowPrePaint -= DgvDatas_RowPrePaint;
                 this.OnDGVDataChang -= MainFm_OnDGVDataChang;
                 Log.Error("表格初始化失败", ex);
             }
         }
 
-        private void DgvDatas_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+        private void DgvDatas_RowPrePaint(object? sender, DataGridViewRowPrePaintEventArgs e)
         {
-            if (dgvDatas.Columns[e.ColumnIndex].Name == "IsAlarm")
-            {
-                if (e.RowIndex < 0 || e.RowIndex >= dgvDatas.Rows.Count)
-                    return;
-                var device = dgvDatas.Rows[e.RowIndex].DataBoundItem as DgvDeviceInfo;
-                if (device == null) return;
+            if (e.RowIndex < 0 || e.RowIndex >= this.dgvDatas.Rows.Count)
+                return;
+            var device = this.dgvDatas.Rows[e.RowIndex].DataBoundItem as DgvDeviceInfo;
+            if (device == null) return;
 
-                // 只有DGV自己绘制时才变色，效率提升100倍
-                e.CellStyle.BackColor = device.IsAlarm ? Color.Red : Color.White;
-            }
+            this.dgvDatas.Rows[e.RowIndex].DefaultCellStyle.BackColor =
+           device.IsAlarm ? Color.Red : Color.White;
         }
 
         /// <summary>

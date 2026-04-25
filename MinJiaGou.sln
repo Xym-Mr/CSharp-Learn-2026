@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelegateCommunication", "De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinWorkShopMonitorSystem", "MinWorkShopMonitorSystem\MinWorkShopMonitorSystem.csproj", "{098C385E-3A0A-4F47-99C4-8E9744A50248}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDLC_MinSingleDeviceDataMonitorSystem", "SDLC_MinSingleDeviceDataMonitorSystem\SDLC_MinSingleDeviceDataMonitorSystem.csproj", "{B5FD24FC-5D76-4525-B319-55CF93D1F07C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{098C385E-3A0A-4F47-99C4-8E9744A50248}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{098C385E-3A0A-4F47-99C4-8E9744A50248}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{098C385E-3A0A-4F47-99C4-8E9744A50248}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5FD24FC-5D76-4525-B319-55CF93D1F07C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5FD24FC-5D76-4525-B319-55CF93D1F07C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5FD24FC-5D76-4525-B319-55CF93D1F07C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5FD24FC-5D76-4525-B319-55CF93D1F07C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
